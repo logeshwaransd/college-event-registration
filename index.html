@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#342a83">
+  <title>Campus Connect 2026 | College Event Registration</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .event-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 700px; }
+    @media (max-width: 560px) { .event-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#home" aria-label="Campus Connect home"><span class="brand-icon">✦</span><span>Campus<span>Connect</span></span></a>
+    <button class="menu-button" id="menuButton" aria-expanded="false" aria-controls="navigation">Menu</button>
+    <nav id="navigation" aria-label="Main navigation">
+      <a href="#events">Events</a><a href="#schedule">Schedule</a><a href="#register" class="nav-cta">Register now</a>
+    </nav>
+  </header>
+
+  <main id="home">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">ANNUAL COLLEGE FEST · 14–16 MARCH 2026</p>
+        <h1>Find your stage.<br><em>Make it count.</em></h1>
+        <p class="hero-text">Three days of ideas, art, code and competition. Pick your event and reserve your place at Campus Connect 2026.</p>
+        <div class="hero-actions"><a class="button primary" href="#register">Register for an event <span>→</span></a><a class="button text" href="#events">Explore events</a></div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="orb orb-one"></div><div class="orb orb-two"></div><div class="event-badge"><span>2026</span><b>CC</b></div>
+        <div class="spark spark-one">✦</div><div class="spark spark-two">✦</div>
+      </div>
+    </section>
+
+    <section class="quick-info" aria-label="Festival information">
+      <div><span class="info-icon">⌖</span><p><b>Central Campus</b><br>Auditorium & activity block</p></div>
+      <div><span class="info-icon">◷</span><p><b>9:00 AM onwards</b><br>14–16 March 2026</p></div>
+      <div><span class="info-icon">◎</span><p><b>Open to all students</b><br>Individual & team events</p></div>
+    </section>
+
+    <section class="section events" id="events">
+      <div class="section-heading"><div><p class="eyebrow">CHOOSE YOUR CHALLENGE</p><h2>Featured events</h2></div><p>Registration is free. Bring your college ID on the day.</p></div>
+      <div class="event-grid">
+        <article class="event-card culture"><div class="event-symbol">♬</div><span class="tag">DANCE</span><h3>Dance Battle</h3><p>Own the stage with your best solo or group dance performance.</p><div class="event-meta"><span>15 Mar · 5:30 PM</span><span>Solo or group</span></div><button class="event-register" data-event="Dance Battle">Register <span>→</span></button></article>
+        <article class="event-card ideas"><div class="event-symbol">♫</div><span class="tag">SINGING</span><h3>Voice of Campus</h3><p>Bring your voice, your song and your confidence to the spotlight.</p><div class="event-meta"><span>16 Mar · 4:00 PM</span><span>Solo performance</span></div><button class="event-register" data-event="Voice of Campus">Register <span>→</span></button></article>
+      </div>
+    </section>
+
+    <section class="section schedule" id="schedule">
+      <div class="section-heading"><div><p class="eyebrow">SAVE THE DATES</p><h2>Festival schedule</h2></div></div>
+      <div class="schedule-list">
+        <div class="schedule-item"><div class="day">14 <small>MAR</small></div><div><h3>Registrations & rehearsal</h3><p>Participant check-in · Stage rehearsal</p></div><span>10:00 AM – 05:00 PM</span></div>
+        <div class="schedule-item"><div class="day">15 <small>MAR</small></div><div><h3>Dance Battle</h3><p>Solo and group dance performances</p></div><span>05:30 PM – 08:30 PM</span></div>
+        <div class="schedule-item"><div class="day">16 <small>MAR</small></div><div><h3>Voice of Campus</h3><p>Singing performances · Prize ceremony</p></div><span>04:00 PM – 07:00 PM</span></div>
+      </div>
+    </section>
+
+    <section class="register-wrap" id="register">
+      <div class="register-copy"><p class="eyebrow">READY WHEN YOU ARE</p><h2>Reserve your<br><em>spot today.</em></h2><p>Fill in your details. We’ll display your registration confirmation immediately.</p><div class="tiny-note">✦ One registration per event · ✦ College ID required at check-in</div></div>
+      <form id="registrationForm" class="registration-form" novalidate>
+        <h3>Event registration</h3>
+        <div class="form-row"><div class="field"><label for="name">Full name</label><input id="name" name="name" autocomplete="name" placeholder="Your name" required></div><div class="field"><label for="studentId">Student ID</label><input id="studentId" name="studentId" placeholder="e.g. 23CSE104" required></div></div>
+        <div class="field"><label for="email">Student email</label><input id="email" name="email" type="email" autocomplete="email" placeholder="you@student.com" required></div>
+        <div class="form-row"><div class="field"><label for="department">Department</label><input id="department" name="department" placeholder="e.g. Computer Science" required></div><div class="field"><label for="event">Choose event</label><select id="event" name="event" required><option value="">Select an event</option><option>Dance Battle</option><option>Voice of Campus</option></select></div></div>
+        <label class="check"><input id="terms" type="checkbox" required><span>I confirm that the details are correct.</span></label>
+        <p class="form-message" id="formMessage" role="alert"></p>
+        <button class="button primary submit-button" type="submit">Complete registration <span>→</span></button>
+      </form>
+    </section>
+
+    <section class="confirmation" id="confirmation" hidden aria-live="polite"><div class="confirmation-mark">✓</div><div><p class="eyebrow">YOU’RE REGISTERED</p><h2>See you at Campus Connect!</h2><p id="confirmationText"></p></div><button id="newRegistration" class="button text">Register another event</button></section>
+  </main>
+  <footer><a class="brand" href="#home"><span class="brand-icon">✦</span><span>Campus<span>Connect</span></span></a><p>Campus Connect 2026 · Made for your college community</p></footer>
+  <script src="app.js"></script>
+</body>
+</html>
