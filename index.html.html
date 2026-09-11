@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sri Eshwar College of Engineering - Attendance System [I B.E. CSE(AI&ML) - A]</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Font (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            50: '#f0f3ff',
+                            100: '#e0e7ff',
+                            500: '#4f46e5',
+                            600: '#4338ca',
+                            700: '#3730a3',
+                            900: '#1e1b4b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.2s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(3px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16 sm:h-20">
+                <!-- Branding Header -->
+                <div class="flex items-center space-x-3 sm:space-x-4">
+                    <div class="p-2 sm:p-2.5 bg-indigo-600 rounded-2xl text-white shadow-md shadow-indigo-200 dark:shadow-none flex items-center justify-center shrink-0">
+                        <i data-lucide="graduation-cap" class="w-6 h-6 sm:w-7 sm:h-7"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-extrabold text-slate-900 dark:text-white text-base sm:text-lg leading-tight tracking-tight">Sri Eshwar College of Engineering</h1>
+                            <span class="hidden md:inline-block px-2 py-0.5 text-[10px] font-bold bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 rounded-md border border-amber-200 dark:border-amber-800">NAAC A+ / NBA</span>
+                        </div>
+                        <p class="text-xs font-semibold text-indigo-600 dark:text-indigo-400">I B.E. CSE(AI&ML) - Section A &bull; <span class="text-slate-500 dark:text-slate-400 font-medium">Room AI 101</span></p>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs (Desktop) -->
+                <nav class="hidden md:flex space-x-1 bg-slate-100 dark:bg-slate-700/60 p-1.5 rounded-2xl border border-slate-200/60 dark:border-slate-700">
+                    <button onclick="switchTab('attendance')" id="nav-attendance" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 transition flex items-center gap-2 bg-white dark:bg-slate-800 shadow-sm">
+                        <i data-lucide="clipboard-check" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i> Mark Attendance
+                    </button>
+                    <button onclick="switchTab('analytics')" id="nav-analytics" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 transition flex items-center gap-2">
+                        <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Analytics & Reports
+                    </button>
+                    <button onclick="switchTab('roster')" id="nav-roster" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 transition flex items-center gap-2">
+                        <i data-lucide="users" class="w-4 h-4"></i> Class Roster (64)
+                    </button>
+                </nav>
+
+                <!-- Top Right Utility Buttons -->
+                <div class="flex items-center space-x-2">
+                    <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 transition" title="Toggle Theme">
+                        <i data-lucide="moon" id="theme-icon" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="toggleGithubModal(true)" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl transition" title="GitHub Deploy Guide">
+                        <i data-lucide="github" class="w-4 h-4"></i>
+                        <span class="hidden lg:inline">Host on GitHub</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Navigation -->
+            <div class="flex md:hidden border-t border-slate-100 dark:border-slate-700/60 py-2 justify-around">
+                <button onclick="switchTab('attendance')" id="mob-nav-attendance" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
+                    <i data-lucide="clipboard-check" class="w-3.5 h-3.5"></i> Mark
+                </button>
+                <button onclick="switchTab('analytics')" id="mob-nav-analytics" class="px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 flex items-center gap-1">
+                    <i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i> Reports
+                </button>
+                <button onclick="switchTab('roster')" id="mob-nav-roster" class="px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 flex items-center gap-1">
+                    <i data-lucide="users" class="w-3.5 h-3.5"></i> Roster
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+
+        <!-- Class Metadata Card -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-700 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full text-xs">
+                <div class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-700">
+                    <div class="p-2 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 rounded-lg"><i data-lucide="user-check" class="w-4 h-4"></i></div>
+                    <div>
+                        <p class="text-[10px] uppercase font-bold text-slate-400">Class Advisor (English)</p>
+                        <p class="font-bold text-slate-800 dark:text-slate-100">Dr. S. VANI <span class="font-normal text-slate-500">(AP/ENGLISH)</span></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-700">
+                    <div class="p-2 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 rounded-lg"><i data-lucide="cpu" class="w-4 h-4"></i></div>
+                    <div>
+                        <p class="text-[10px] uppercase font-bold text-slate-400">Class Advisor (AI&ML)</p>
+                        <p class="font-bold text-slate-800 dark:text-slate-100">Mr. MOHAMMED RAYEED <span class="font-normal text-slate-500">(AP/AI&ML)</span></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-700 sm:col-span-2 lg:col-span-1">
+                    <div class="p-2 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 rounded-lg"><i data-lucide="phone" class="w-4 h-4"></i></div>
+                    <div>
+                        <p class="text-[10px] uppercase font-bold text-slate-400">Advisor Contacts</p>
+                        <p class="font-bold text-slate-800 dark:text-slate-100">9787041641 &bull; 8807024898</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Metrics Ribbon -->
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-3.5 sm:gap-4">
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Enrolled</p>
+                    <h3 id="stat-total" class="text-2xl font-black text-slate-800 dark:text-white mt-0.5">64</h3>
+                </div>
+                <div class="p-3 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 rounded-xl">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Present Today</p>
+                    <h3 id="stat-present" class="text-2xl font-black text-slate-800 dark:text-white mt-0.5">0</h3>
+                </div>
+                <div class="p-3 bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300 rounded-xl">
+                    <i data-lucide="user-check" class="w-5 h-5"></i>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-rose-500 dark:text-rose-400">Absent Today</p>
+                    <h3 id="stat-absent" class="text-2xl font-black text-slate-800 dark:text-white mt-0.5">0</h3>
+                </div>
+                <div class="p-3 bg-rose-50 dark:bg-rose-900/40 text-rose-600 dark:text-rose-300 rounded-xl">
+                    <i data-lucide="user-x" class="w-5 h-5"></i>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-amber-500 dark:text-amber-400">Late / On-Duty</p>
+                    <h3 id="stat-late" class="text-2xl font-black text-slate-800 dark:text-white mt-0.5">0</h3>
+                </div>
+                <div class="p-3 bg-amber-50 dark:bg-amber-900/40 text-amber-600 dark:text-amber-300 rounded-xl">
+                    <i data-lucide="clock" class="w-5 h-5"></i>
+                </div>
+            </div>
+
+            <div class="col-span-2 lg:col-span-1 bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">Attendance Rate</p>
+                    <h3 id="stat-rate" class="text-2xl font-black text-slate-800 dark:text-white mt-0.5">0%</h3>
+                </div>
+                <div class="p-3 bg-sky-50 dark:bg-sky-900/40 text-sky-600 dark:text-sky-300 rounded-xl">
+                    <i data-lucide="percent" class="w-5 h-5"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 1: MARK ATTENDANCE -->
+        <div id="tab-attendance" class="tab-content active space-y-4">
+            <!-- Table Toolbar -->
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                    <!-- Date Picker -->
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Select Session Date</label>
+                        <input type="date" id="filter-date" onchange="renderAttendanceTable()" class="bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-white text-xs font-bold rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <!-- Search Field -->
+                    <div class="flex-1 min-w-[200px]">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Search Student</label>
+                        <div class="relative">
+                            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i>
+                            <input type="text" id="search-input" onkeyup="renderAttendanceTable()" placeholder="Search by S.No or Student Name..." class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-white text-xs rounded-xl pl-9 pr-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bulk Quick Action Buttons -->
+                <div class="flex items-center gap-2 pt-2 md:pt-0 border-t md:border-0 border-slate-100 dark:border-slate-700 justify-end">
+                    <button onclick="bulkMark('Present')" class="px-3.5 py-2 text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-800 rounded-xl transition flex items-center gap-1.5">
+                        <i data-lucide="check-circle-2" class="w-4 h-4"></i> Mark All Present
+                    </button>
+                    <button onclick="bulkMark('Absent')" class="px-3.5 py-2 text-xs font-bold bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 hover:bg-rose-100 border border-rose-200 dark:border-rose-800 rounded-xl transition flex items-center gap-1.5">
+                        <i data-lucide="x-circle" class="w-4 h-4"></i> Mark All Absent
+                    </button>
+                </div>
+            </div>
+
+            <!-- Attendance Data Table -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+                    <table class="w-full text-left text-xs text-slate-600 dark:text-slate-300">
+                        <thead class="bg-slate-50 dark:bg-slate-700/80 text-slate-500 dark:text-slate-300 uppercase text-[11px] font-bold tracking-wider border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10 backdrop-blur-sm">
+                            <tr>
+                                <th class="py-3.5 px-5">S.No</th>
+                                <th class="py-3.5 px-5">Student Name</th>
+                                <th class="py-3.5 px-5">Department & Sec</th>
+                                <th class="py-3.5 px-5">Current Status</th>
+                                <th class="py-3.5 px-5 text-center">Mark Status Options</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendance-table-body" class="divide-y divide-slate-100 dark:divide-slate-700/60 font-medium">
+                            <!-- JS Injected rows -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="attendance-empty" class="hidden text-center py-10">
+                    <i data-lucide="search-x" class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2"></i>
+                    <p class="text-slate-500 text-xs font-semibold">No students match your search criteria.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: ANALYTICS & CSV EXPORT -->
+        <div id="tab-analytics" class="tab-content space-y-6">
+            <!-- Action Ribbon -->
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white">Section Attendance Performance</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Class cumulative insights and downloadable session logs.</p>
+                </div>
+                <button onclick="exportToCSV()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+                    <i data-lucide="download" class="w-4 h-4"></i> Download Attendance CSV
+                </button>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Doughnut Chart -->
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex flex-col">
+                    <h3 class="font-bold text-slate-800 dark:text-slate-100 text-xs uppercase tracking-wider mb-4">Overall Distribution</h3>
+                    <div class="relative flex-1 flex items-center justify-center min-h-[220px]">
+                        <canvas id="doughnutChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Bar Chart -->
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm lg:col-span-2">
+                    <h3 class="font-bold text-slate-800 dark:text-slate-100 text-xs uppercase tracking-wider mb-4">Daily Class Attendance Trend</h3>
+                    <div class="relative h-[220px]">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Progress Bars -->
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-4">
+                <h3 class="font-bold text-slate-800 dark:text-slate-100 text-xs uppercase tracking-wider">Per-Student Attendance Ratios</h3>
+                <div id="student-progress-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2">
+                    <!-- Progress items injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: CLASS ROSTER MANAGEMENT -->
+        <div id="tab-roster" class="tab-content space-y-4">
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white">I B.E. CSE(AI&ML) - Section A Roster</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Total 64 Enrolled Students</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="resetToDefaultRoster()" class="px-3.5 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5" title="Reset default 64 students list">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset Default Roster
+                    </button>
+                    <button onclick="toggleAddStudentModal(true)" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                        <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Add Student
+                    </button>
+                </div>
+            </div>
+
+            <!-- Roster Table -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto max-h-[550px] overflow-y-auto">
+                    <table class="w-full text-left text-xs text-slate-600 dark:text-slate-300">
+                        <thead class="bg-slate-50 dark:bg-slate-700/80 text-slate-500 dark:text-slate-300 uppercase text-[11px] font-bold tracking-wider border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10">
+                            <tr>
+                                <th class="py-3.5 px-6">S.No</th>
+                                <th class="py-3.5 px-6">Student Name</th>
+                                <th class="py-3.5 px-6">Department & Section</th>
+                                <th class="py-3.5 px-6 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="roster-table-body" class="divide-y divide-slate-100 dark:divide-slate-700/60 font-medium">
+                            <!-- JS Injected Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL 1: ADD NEW STUDENT -->
+    <div id="add-student-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 dark:border-slate-700">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-700 mb-4">
+                <h3 class="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
+                    <i data-lucide="user-plus" class="w-5 h-5 text-indigo-600"></i> Add Student to Roster
+                </h3>
+                <button onclick="toggleAddStudentModal(false)" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleAddStudent(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">S.No (Serial Number)</label>
+                    <input type="number" id="input-sno" required placeholder="e.g. 65" class="w-full border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Full Student Name</label>
+                    <input type="text" id="input-name" required placeholder="e.g. VISWANATH M" class="w-full border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-500 uppercase">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Class / Department</label>
+                    <input type="text" id="input-dept" value="I B.E. CSE(AI&ML) - A" readonly class="w-full border border-slate-200 dark:border-slate-600 bg-slate-100 dark:bg-slate-600/50 text-slate-500 rounded-xl px-3 py-2 text-xs font-semibold outline-none">
+                </div>
+
+                <div class="pt-3 flex justify-end gap-2">
+                    <button type="button" onclick="toggleAddStudentModal(false)" class="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 rounded-xl transition">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition shadow-sm">Save Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: GITHUB PAGES DEPLOYMENT GUIDE -->
+    <div id="github-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 dark:border-slate-700 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-700 mb-4">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="github" class="w-6 h-6 text-slate-800 dark:text-white"></i>
+                    <h3 class="font-bold text-slate-900 dark:text-white text-base">How to Host This Web Application on GitHub Pages</h3>
+                </div>
+                <button onclick="toggleGithubModal(false)" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4 text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
+                <p>Follow these quick steps to deploy this exact Sri Eshwar attendance system live on the web for free:</p>
+                
+                <ol class="space-y-2.5 list-decimal list-inside font-medium">
+                    <li class="bg-slate-50 dark:bg-slate-700/50 p-3 rounded-xl border border-slate-200/70 dark:border-slate-700">
+                        <strong class="text-slate-800 dark:text-white">Save Code File:</strong>
+                        <p class="text-slate-500 dark:text-slate-400 mt-0.5 pl-4">Save this complete code file locally as <code class="bg-slate-200 dark:bg-slate-600 text-slate-900 dark:text-slate-100 px-1.5 py-0.5 rounded font-mono">index.html</code>.</p>
+                    </li>
+                    <li class="bg-slate-50 dark:bg-slate-700/50 p-3 rounded-xl border border-slate-200/70 dark:border-slate-700">
+                        <strong class="text-slate-800 dark:text-white">Create GitHub Repository:</strong>
+                        <p class="text-slate-500 dark:text-slate-400 mt-0.5 pl-4">Go to <a href="https://github.com" target="_blank" class="text-indigo-600 dark:text-indigo-400 underline">GitHub.com</a>, create a new Public repository named <code class="bg-slate-200 dark:bg-slate-600 text-slate-900 dark:text-slate-100 px-1.5 py-0.5 rounded font-mono">sece-attendance</code>.</p>
+                    </li>
+                    <li class="bg-slate-50 dark:bg-slate-700/50 p-3 rounded-xl border border-slate-200/70 dark:border-slate-700">
+                        <strong class="text-slate-800 dark:text-white">Upload index.html:</strong>
+                        <p class="text-slate-500 dark:text-slate-400 mt-0.5 pl-4">Click <em>Upload an existing file</em>, drag your <code class="bg-slate-200 dark:bg-slate-600 text-slate-900 dark:text-slate-100 px-1.5 py-0.5 rounded font-mono">index.html</code>, and click <em>Commit changes</em>.</p>
+                    </li>
+                    <li class="bg-slate-50 dark:bg-slate-700/50 p-3 rounded-xl border border-slate-200/70 dark:border-slate-700">
+                        <strong class="text-slate-800 dark:text-white">Turn on Pages:</strong>
+                        <p class="text-slate-500 dark:text-slate-400 mt-0.5 pl-4">Go to Repo <strong>Settings &rarr; Pages</strong>. Under <em>Branch</em>, select <code class="bg-slate-200 dark:bg-slate-600 text-slate-900 dark:text-slate-100 px-1.5 py-0.5 rounded font-mono">main</code> and click <strong>Save</strong>.</p>
+                    </li>
+                </ol>
+
+                <div class="bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-xl p-3 text-emerald-800 dark:text-emerald-300 text-xs">
+                    <strong>Live Web URL:</strong> Your site will be published live in ~1 minute at:<br>
+                    <code class="font-mono text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/60 px-2 py-0.5 rounded mt-1 inline-block">https://your-username.github.io/sece-attendance/</code>
+                </div>
+            </div>
+
+            <div class="pt-4 mt-4 border-t border-slate-100 dark:border-slate-700 flex justify-end">
+                <button onclick="toggleGithubModal(false)" class="px-4 py-2 text-xs font-bold text-white bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 rounded-xl transition">Got it!</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Official Roster of 64 Students from Sri Eshwar College of Engineering - I B.E. CSE(AI&ML) - Section A
+        const official64Students = [
+            { sno: 1, name: "ABDUL GAFOOR M", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 2, name: "AHAMED AFZAL I", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 3, name: "AKARSHANA R", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 4, name: "AKASH K", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 5, name: "AKASHKUMAR T", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 6, name: "AKSHARA D", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 7, name: "AKSHARA M", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 8, name: "AKSHAYA G", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 9, name: "AKSHAYA S", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 10, name: "AKSHAYA U", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 11, name: "ANBARASU N", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 12, name: "ANICHA R", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 13, name: "ARULMURUGAN M", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 14, name: "AVANTIKA S", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 15, name: "BARANIKA S N", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 16, name: "BAVANASRI S", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 17, name: "BHAGAVANTH S", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 18, name: "BHASVESH V", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 19, name: "BIRAJ PATEL", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 20, name: "DHANUSHIYA P", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 21, name: "DHARANEESH V", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 22, name: "DHARANI M", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 23, name: "DHARSHAN A B", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 24, name: "DHIVESH S", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 25, name: "EKANTIKAA", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 26, name: "GIRIJA SHREE M", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 27, name: "GOPI KRISHNAN M", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 28, name: "GOWTHAM S", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 29, name: "GURUPRABHU V S", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 30, name: "GURUPRASATH V", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 31, name: "HAASINI J V", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 32, name: "HAMSA RITHANYA S", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 33, name: "HARI PRANAV K S", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 34, name: "HARIPRASAD K C", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 35, name: "HARIS K", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 36, name: "HARSHIKA C", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 37, name: "HASINI K M", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 38, name: "HEMANTH KUMAR S", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 39, name: "HEMAVARSHINI P", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 40, name: "S JAI SAI RAGAVENDRAN", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 41, name: "JASHMITHASREE SENTHIL KUMAR", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 42, name: "JOTHIGA T G", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 43, name: "JOTHILAKSHMI K", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 44, name: "KAAMNA R", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 45, name: "KAJASRI S", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 46, name: "KANISHIK A", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 47, name: "KARANCIN M", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 48, name: "KARNATI VENKATESH", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 49, name: "B KARTHICK", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 50, name: "KAVIYA K", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 51, name: "KAVYA M S", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 52, name: "KIRUBHAKARAN M", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 53, name: "LOGESHWARAN B", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 54, name: "LOGESHWARAN S", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 55, name: "MADHU NANDHIKA M", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 56, name: "MAHALAKSHMI M", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 57, name: "MIRUTHIKA S", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 58, name: "MOHAMMED SHAREEF S", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 59, name: "MOHAMMED SUHAIB S", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 60, name: "MONIKKA R S", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 61, name: "MUGUNTHAN R", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 62, name: "NAR BAHADUR SAUD", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 63, name: "NARESH M", class: "I B.E. CSE(AI&ML) - A" },
+            { sno: 64, name: "NAVEEN V", class: "I B.E. CSE(AI&ML) - A" }
+        ];
+
+        // Global State Variables
+        let students = [];
+        let attendanceLogs = {}; // Key: "YYYY-MM-DD", Value: { [sno]: "Present" | "Absent" | "Late" | "OD" }
+        let doughnutChartInstance = null;
+        let barChartInstance = null;
+
+        // On Page Load Initialization
+        window.onload = function() {
+            // Set current date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('filter-date').value = today;
+
+            // Load persistent storage
+            loadFromLocalStorage();
+
+            // Initialize Lucide icons
+            lucide.createIcons();
+
+            // Render tables & setup charts
+            renderAttendanceTable();
+            renderRosterTable();
+            initCharts();
+        };
+
+        // --- LOCAL STORAGE FUNCTIONS ---
+        function loadFromLocalStorage() {
+            const savedStudents = localStorage.getItem('sece_aiml_students');
+            const savedLogs = localStorage.getItem('sece_aiml_logs');
+
+            students = savedStudents ? JSON.parse(savedStudents) : [...official64Students];
+            attendanceLogs = savedLogs ? JSON.parse(savedLogs) : {};
+
+            if (!savedStudents) saveToLocalStorage();
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('sece_aiml_students', JSON.stringify(students));
+            localStorage.setItem('sece_aiml_logs', JSON.stringify(attendanceLogs));
+        }
+
+        function resetToDefaultRoster() {
+            students = [...official64Students];
+            saveToLocalStorage();
+            renderAttendanceTable();
+            renderRosterTable();
+        }
+
+        // --- TAB NAVIGATION ---
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+
+            const tabs = ['attendance', 'analytics', 'roster'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`nav-${t}`);
+                const mobBtn = document.getElementById(`mob-nav-${t}`);
+
+                if (t === tabName) {
+                    btn?.classList.add('bg-white', 'dark:bg-slate-800', 'shadow-sm', 'text-slate-900', 'dark:text-white');
+                    btn?.classList.remove('text-slate-600', 'dark:text-slate-300');
+                    mobBtn?.classList.add('bg-indigo-50', 'dark:bg-indigo-950/60', 'text-indigo-600', 'dark:text-indigo-400');
+                    mobBtn?.classList.remove('text-slate-600', 'dark:text-slate-400');
+                } else {
+                    btn?.classList.remove('bg-white', 'dark:bg-slate-800', 'shadow-sm', 'text-slate-900', 'dark:text-white');
+                    btn?.classList.add('text-slate-600', 'dark:text-slate-300');
+                    mobBtn?.classList.remove('bg-indigo-50', 'dark:bg-indigo-950/60', 'text-indigo-600', 'dark:text-indigo-400');
+                    mobBtn?.classList.add('text-slate-600', 'dark:text-slate-400');
+                }
+            });
+
+            if (tabName === 'analytics') {
+                updateAnalytics();
+            }
+        }
+
+        // --- ATTENDANCE MARKING FUNCTIONS ---
+        function getDateKey() {
+            return document.getElementById('filter-date').value;
+        }
+
+        function renderAttendanceTable() {
+            const searchQuery = document.getElementById('search-input').value.toLowerCase();
+            const dateKey = getDateKey();
+            const currentLog = attendanceLogs[dateKey] || {};
+
+            const tbody = document.getElementById('attendance-table-body');
+            const emptyState = document.getElementById('attendance-empty');
+            tbody.innerHTML = '';
+
+            const filtered = students.filter(s => 
+                s.sno.toString().includes(searchQuery) || 
+                s.name.toLowerCase().includes(searchQuery)
+            );
+
+            if (filtered.length === 0) emptyState.classList.remove('hidden');
+            else emptyState.classList.add('hidden');
+
+            filtered.forEach(student => {
+                const status = currentLog[student.sno] || 'Not Marked';
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors";
+
+                row.innerHTML = `
+                    <td class="py-3.5 px-5 font-bold text-slate-800 dark:text-slate-200">#${student.sno}</td>
+                    <td class="py-3.5 px-5 font-semibold text-slate-900 dark:text-white">${student.name}</td>
+                    <td class="py-3.5 px-5 text-slate-500 dark:text-slate-400">${student.class}</td>
+                    <td class="py-3.5 px-5">${getStatusBadge(status)}</td>
+                    <td class="py-3.5 px-5 text-center">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button onclick="markStatus(${student.sno}, 'Present')" class="px-2.5 py-1 text-xs font-bold rounded-lg transition ${status === 'Present' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/40 hover:text-emerald-600'}">Present</button>
+                            <button onclick="markStatus(${student.sno}, 'Absent')" class="px-2.5 py-1 text-xs font-bold rounded-lg transition ${status === 'Absent' ? 'bg-rose-600 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-rose-50 dark:hover:bg-rose-900/40 hover:text-rose-600'}">Absent</button>
+                            <button onclick="markStatus(${student.sno}, 'Late')" class="px-2.5 py-1 text-xs font-bold rounded-lg transition ${status === 'Late' ? 'bg-amber-500 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-amber-50 dark:hover:bg-amber-900/40 hover:text-amber-600'}">Late</button>
+                            <button onclick="markStatus(${student.sno}, 'OD')" class="px-2.5 py-1 text-xs font-bold rounded-lg transition ${status === 'OD' ? 'bg-sky-600 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-sky-900/40 hover:text-sky-600'}">OD</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            updateOverviewMetrics();
+            lucide.createIcons();
+        }
+
+        function getStatusBadge(status) {
+            switch(status) {
+                case 'Present':
+                    return `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Present</span>`;
+                case 'Absent':
+                    return `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-50 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>Absent</span>`;
+                case 'Late':
+                    return `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Late</span>`;
+                case 'OD':
+                    return `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-50 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800"><span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>On Duty</span>`;
+                default:
+                    return `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>Not Marked</span>`;
+            }
+        }
+
+        function markStatus(sno, status) {
+            const dateKey = getDateKey();
+            if (!attendanceLogs[dateKey]) attendanceLogs[dateKey] = {};
+            attendanceLogs[dateKey][sno] = status;
+            saveToLocalStorage();
+            renderAttendanceTable();
+        }
+
+        function bulkMark(status) {
+            const dateKey = getDateKey();
+            if (!attendanceLogs[dateKey]) attendanceLogs[dateKey] = {};
+
+            students.forEach(s => {
+                attendanceLogs[dateKey][s.sno] = status;
+            });
+
+            saveToLocalStorage();
+            renderAttendanceTable();
+        }
+
+        // --- OVERVIEW STATS UPDATE ---
+        function updateOverviewMetrics() {
+            const dateKey = getDateKey();
+            const currentLog = attendanceLogs[dateKey] || {};
+
+            let present = 0, absent = 0, late = 0;
+
+            students.forEach(s => {
+                const status = currentLog[s.sno];
+                if (status === 'Present' || status === 'OD') present++;
+                else if (status === 'Absent') absent++;
+                else if (status === 'Late') late++;
+            });
+
+            const total = students.length;
+            const rate = total > 0 ? Math.round(((present + late) / total) * 100) : 0;
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-present').innerText = present;
+            document.getElementById('stat-absent').innerText = absent;
+            document.getElementById('stat-late').innerText = late;
+            document.getElementById('stat-rate').innerText = `${rate}%`;
+        }
+
+        // --- ROSTER MANAGEMENT ---
+        function renderRosterTable() {
+            const tbody = document.getElementById('roster-table-body');
+            tbody.innerHTML = '';
+
+            students.forEach(s => {
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors";
+                row.innerHTML = `
+                    <td class="py-3.5 px-6 font-bold text-slate-800 dark:text-slate-200">#${s.sno}</td>
+                    <td class="py-3.5 px-6 font-semibold text-slate-900 dark:text-white">${s.name}</td>
+                    <td class="py-3.5 px-6 text-slate-500 dark:text-slate-400">${s.class}</td>
+                    <td class="py-3.5 px-6 text-right">
+                        <button onclick="deleteStudent(${s.sno})" class="text-rose-500 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/50 transition" title="Delete Student">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            lucide.createIcons();
+        }
+
+        function handleAddStudent(e) {
+            e.preventDefault();
+            const sno = parseInt(document.getElementById('input-sno').value);
+            const name = document.getElementById('input-name').value.trim().toUpperCase();
+            const deptClass = document.getElementById('input-dept').value;
+
+            if (!sno || !name) return;
+
+            // Check if S.No already exists
+            if (students.some(s => s.sno === sno)) {
+                alert(`Serial Number #${sno} is already assigned to another student!`);
+                return;
+            }
+
+            students.push({ sno, name, class: deptClass });
+            students.sort((a, b) => a.sno - b.sno); // keep sorted by S.No
+
+            saveToLocalStorage();
+
+            document.getElementById('input-sno').value = '';
+            document.getElementById('input-name').value = '';
+            toggleAddStudentModal(false);
+
+            renderAttendanceTable();
+            renderRosterTable();
+        }
+
+        function deleteStudent(sno) {
+            students = students.filter(s => s.sno !== sno);
+            saveToLocalStorage();
+            renderAttendanceTable();
+            renderRosterTable();
+        }
+
+        // --- CHARTS & ANALYTICS ---
+        function initCharts() {
+            const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
+            doughnutChartInstance = new Chart(ctxDoughnut, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Present', 'Absent', 'Late', 'OD'],
+                    datasets: [{
+                        data: [0, 0, 0, 0],
+                        backgroundColor: ['#10b981', '#f43f5e', '#f59e0b', '#0284c7'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+
+            const ctxBar = document.getElementById('barChart').getContext('2d');
+            barChartInstance = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+                    datasets: [{
+                        label: 'Class Attendance %',
+                        data: [92, 95, 88, 96, 90],
+                        backgroundColor: '#6366f1',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, max: 100 } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            updateAnalytics();
+        }
+
+        function updateAnalytics() {
+            if (!doughnutChartInstance) return;
+
+            let present = 0, absent = 0, late = 0, od = 0;
+
+            Object.values(attendanceLogs).forEach(dayLog => {
+                Object.values(dayLog).forEach(status => {
+                    if (status === 'Present') present++;
+                    if (status === 'Absent') absent++;
+                    if (status === 'Late') late++;
+                    if (status === 'OD') od++;
+                });
+            });
+
+            doughnutChartInstance.data.datasets[0].data = [present, absent, late, od];
+            doughnutChartInstance.update();
+
+            // Render Per-Student Percentage List
+            const progressContainer = document.getElementById('student-progress-list');
+            progressContainer.innerHTML = '';
+
+            students.forEach(s => {
+                let totalSessions = 0;
+                let attended = 0;
+
+                Object.keys(attendanceLogs).forEach(dateKey => {
+                    const status = attendanceLogs[dateKey][s.sno];
+                    if (status) {
+                        totalSessions++;
+                        if (status === 'Present' || status === 'Late' || status === 'OD') attended++;
+                    }
+                });
+
+                const rate = totalSessions > 0 ? Math.round((attended / totalSessions) * 100) : 100;
+
+                const item = document.createElement('div');
+                item.className = "space-y-1.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-700/60";
+                item.innerHTML = `
+                    <div class="flex justify-between text-xs font-bold">
+                        <span class="text-slate-800 dark:text-slate-100">#${s.sno} ${s.name}</span>
+                        <span class="${rate >= 85 ? 'text-emerald-600 dark:text-emerald-400' : rate >= 75 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400'}">${rate}% Attendance</span>
+                    </div>
+                    <div class="w-full bg-slate-200 dark:bg-slate-600 rounded-full h-2 overflow-hidden">
+                        <div class="h-2 rounded-full transition-all duration-500 ${rate >= 85 ? 'bg-emerald-500' : rate >= 75 ? 'bg-amber-500' : 'bg-rose-500'}" style="width: ${rate}%"></div>
+                    </div>
+                `;
+                progressContainer.appendChild(item);
+            });
+        }
+
+        // --- EXPORT ATTENDANCE AS CSV REPORT ---
+        function exportToCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,Institution,Class,Room,Date,S.No,Student Name,Status\n";
+
+            Object.keys(attendanceLogs).forEach(dateKey => {
+                const dayLog = attendanceLogs[dateKey];
+                Object.keys(dayLog).forEach(sno => {
+                    const student = students.find(s => s.sno === parseInt(sno));
+                    if (student) {
+                        const status = dayLog[sno];
+                        csvContent += `"Sri Eshwar College of Engineering","I B.E. CSE(AI&ML) - A","AI 101","${dateKey}","${student.sno}","${student.name}","${status}"\n`;
+                    }
+                });
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `SECE_CSE_AIML_A_Attendance_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // --- DARK MODE TOGGLE ---
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('sece_theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('sece_theme', 'dark');
+            }
+            lucide.createIcons();
+        }
+
+        // Restore Dark Mode Preference
+        if (localStorage.getItem('sece_theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+
+        // --- MODAL TOGGLES ---
+        function toggleAddStudentModal(show) {
+            const modal = document.getElementById('add-student-modal');
+            if (show) modal.classList.remove('hidden');
+            else modal.classList.add('hidden');
+        }
+
+        function toggleGithubModal(show) {
+            const modal = document.getElementById('github-modal');
+            if (show) modal.classList.remove('hidden');
+            else modal.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
